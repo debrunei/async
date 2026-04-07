@@ -25,7 +25,9 @@ document
     .querySelector("#async-btn")
     .addEventListener("click", async () => {
         try {
-
+            document.querySelector("#async-status").textContent ="Loading...";
+            document.querySelector("#async-status").className = "status loading";
+            document.querySelector("#async-grid").innerHTML = "";
             const res = await fetch(`${API_BASE}/users`)
             const users = await res.json()
             let html = "";
@@ -36,6 +38,8 @@ document
                      <div class="detail">${user.email}</div>
                  </div>`
             });
+            document.querySelector("#async-status").textContent = "Loaded X users";
+            document.querySelector("#async-status").className = : "status success";
             document.querySelector("#async-grid").innerHTML = html;
         } catch (error) {
             document.querySelector("#async-status").textContent = `Error: ${error.message}`;
