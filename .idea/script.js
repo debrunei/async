@@ -26,7 +26,7 @@ document
     .addEventListener("click", async () => {
         try {
             document.querySelector("#async-status").textContent ="Loading...";
-            document.querySelector("#async-status").className = "status loading";
+            document.querySelector("#async-grid").className = "status loading";
             document.querySelector("#async-grid").innerHTML = "";
             const res = await fetch(`${API_BASE}/users`)
             const users = await res.json()
@@ -38,90 +38,89 @@ document
                      <div class="detail">${user.email}</div>
                  </div>`
             });
-            document.querySelector("#async-status").textContent = "Loaded X users";
-            document.querySelector("#async-status").className = : "status success";
             document.querySelector("#async-grid").innerHTML = html;
+            document.querySelector("#async-status").textContent = `Loaded ${users.length} users`;
+            document.querySelector("#async-status").className = "status success";
         } catch (error) {
             document.querySelector("#async-status").textContent = `Error: ${error.message}`;
             document.querySelector("#async-status").className = "status error";
         }
-    })
+    });
 
 
-// ────────────────────────────────────────────────
-// ── TODO 4 ──────────────────────────────────────
-// BEFORE the await fetch() line:
-//   1. Set #async-status textContent = "Loading..."
-//   2. Set #async-status className = "status loading"
-//   3. Set #async-grid innerHTML = "" (clear old cards)
-// AFTER rendering cards:
-//   1. Set #async-status textContent = "Loaded X users"
-//   2. Set #async-status className = "status success"
-// ────────────────────────────────────────────────
+document
+    .querySelector("#error-test-btn")
+    .addEventListener("click", async () => {
+        try {
+            document.querySelector("#async-status").textContent ="Loading...";
+            document.querySelector("#async-grid").className = "status loading";
+            document.querySelector("#async-grid").innerHTML = "";
+            const res = await fetch(`${API_BASE}/BACKURL`)
+            const users = await res.json()
+            let html = "";
+            users.forEach(user => {
+                html +=
+                    `<div class="card">
+                     <div class="name">${user.name}</div>
+                     <div class="detail">${user.email}</div>
+                 </div>`
+            });
+            document.querySelector("#async-grid").innerHTML = html;
+            document.querySelector("#async-status").textContent = `Loaded ${users.length} users`;
+            document.querySelector("#async-status").className = "status success";
+        } catch (error) {
+            document.querySelector("#async-status").textContent = `Error: ${error.message}`;
+            document.querySelector("#async-status").className = "status error";
+        }
+    });
 
+document
+    .querySelector("#post-btn")
+    .addEventListener("click", async () => {
+        const title = document.getElementById("post-title").value;
+        const body = document.getElementById("post-body").value;
+        const postData = {
+            title: title,
+            body: body,
+            userId: 1};
 
-// ────────────────────────────────────────────────
-// ── TODO 5 ──────────────────────────────────────
-// Select #error-test-btn and add a click listener.
-// Copy your async function but change the URL to:
-//   API_BASE + "/BADURL"
-// Click it — your catch block should show an error.
-// (This button stays broken on purpose for testing.)
-// ────────────────────────────────────────────────
+        const statusElement = document.querySelector("#post-status");
+        const responseElement = document.querySelector("#post-response");
+        const postButton = document.querySelector("#post-btn");
 
+        statusElement.textContent = "Sending...";
+        statusElement.className = "status loading";
 
-// ────────────────────────────────────────────────
-// ── TODO 6 ──────────────────────────────────────
-// Select #post-btn and add a click listener.
-// Inside:
-//   1. const title = document.querySelector("#post-title").value;
-//   2. const body  = document.querySelector("#post-body").value;
-//   3. const postData = { title: title, body: body, userId: 1 };
-// ────────────────────────────────────────────────
+        try{
+            document.querySelector("#post-status").textContent = "Sending...";
+            const response = await fetch(`${API_BASE}/posts`, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(postData),
+            });
+            const data = await response.json();
+            responseElement.textContent = JSON.stringify(data, null, 2);
+            responseElement.classList.add("visible");
+            statusElement.textContent = `Post created! ID:  ${data.id}`;
+            statusElement.className = "status success";
 
+            document.querySelector("#post-title").value = "";
+            document.querySelector("#post-body").value = "";
+        }catch(error){
+         statusElement.textContent = `Error: ${error.message}`;
+         statusElement.className = "status error";
+        }
+    });
 
-// ────────────────────────────────────────────────
-// ── TODO 7 ──────────────────────────────────────
-// Using async/await + try/catch, send a POST:
-//   const response = await fetch(API_BASE + "/posts", {
-//     method: "POST",
-//     headers: { "Content-Type": "application/json" },
-//     body: JSON.stringify(postData)
-//   });
-//   const data = await response.json();
-//
-// Before the fetch, set #post-status to "Sending..."
-// ────────────────────────────────────────────────
-
-
-// ────────────────────────────────────────────────
-// ── TODO 8 ──────────────────────────────────────
-// After successful POST:
-//   1. const display = document.querySelector("#post-response");
-//   2. display.textContent = JSON.stringify(data, null, 2);
-//   3. display.classList.add("visible");
-//   4. Set #post-status textContent = "Post created! ID: " + data.id
-//   5. Set #post-status className = "status success"
-// ────────────────────────────────────────────────
-
-
-// ────────────────────────────────────────────────
-// ── TODO 9 ──────────────────────────────────────
-// In your catch block:
-//   1. Set #post-status textContent = "Error: " + error.message
-//   2. Set #post-status className = "status error"
-// ────────────────────────────────────────────────
-
-
-// ────────────────────────────────────────────────
-// ── TODO 10 ─────────────────────────────────────
-// After TODO 8 (still inside try, after status update):
-//   1. document.querySelector("#post-title").value = "";
-//   2. document.querySelector("#post-body").value = "";
-// Also wire #clear-btn to clear both inputs,
-//   hide #post-response, and clear #post-status.
-// ────────────────────────────────────────────────
-
+document
+    .querySelector("#clear-btn")
+    .addEventListener("click", () => {
+        document.querySelector("#post-title").value = "";
+        document.querySelector("#post-body").value = "";
+        document.querySelector("#post-response").classList.remove("visible");
+        document.querySelector("#post-status").textContent = "";
+        document.querySelector("#post-status").className = "status";
+    });
 
 // ────────────────────────────────────────────────
 // ── TODO 11 (BONUS) ────────────────────────────
